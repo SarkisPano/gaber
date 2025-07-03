@@ -1,6 +1,6 @@
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { signInWithEmailAndPassword } from 'firebase/auth'
+import { createUserWithEmailAndPassword } from 'firebase/auth'
 import React, { useState } from 'react'
 import { Alert, Button, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, View } from 'react-native'
 import { RootStackParamList } from '../navigation'
@@ -8,17 +8,17 @@ import { auth } from '../services/firebase'
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>
 
-export default function LoginScreen() {
+export default function SignUpScreen() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const navigation = useNavigation<NavigationProp>()
 
-  const handleLogin = async () => {
+  const handleSignUp = async () => {
     try {
-      await signInWithEmailAndPassword(auth, email, password)
+      await createUserWithEmailAndPassword(auth, email, password)
       navigation.navigate('Home')
     } catch (error: any) {
-      Alert.alert('Login failed', error.message)
+      Alert.alert('Registration failed', error.message)
     }
   }
 
@@ -28,7 +28,7 @@ export default function LoginScreen() {
     style={{ flex: 1 }}
   >
     <View style={styles.container}>
-      <Text style={styles.title}>Login to Gaber</Text>
+      <Text style={styles.title}>Register for Gaber</Text>
 
       <TextInput
         style={styles.input}
@@ -46,10 +46,7 @@ export default function LoginScreen() {
         onChangeText={setPassword}
       />
 
-      <Button title="Login" onPress={handleLogin} />
-      <Text style={styles.link} onPress={() => navigation.navigate('SignUp')}>
-        Don't have an account? Register
-      </Text>
+      <Button title="Register" onPress={handleSignUp} />
     </View>
     </KeyboardAvoidingView>
   )
@@ -74,11 +71,5 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     paddingHorizontal: 12,
     marginBottom: 16,
-  },
-  link: {
-    marginTop: 16,
-    color: '#0072b1',
-    textAlign: 'center',
-    textDecorationLine: 'underline',
   },
 })

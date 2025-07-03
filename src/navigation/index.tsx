@@ -12,22 +12,28 @@ export type RootStackParamList = {
     profilePicture: string
   }
   Login: undefined
+  SignUp: undefined
+  AuthLoading: undefined
 }
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
 
+import AuthLoadingScreen from '../screens/AuthLoadingScreen'
 import CompleteProfileScreen from '../screens/CompleteProfileScreen'
 import HomeScreen from '../screens/HomeScreen'
 import LinkedInAuthScreen from '../screens/LinkedInAuthScreen'
+import SignUpScreen from '../screens/SignUpScreen'
 
 export default function Navigation() {
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="Login">
+      <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="AuthLoading">
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="LinkedInAuth" component={LinkedInAuthScreen} />
         <Stack.Screen name="CompleteProfile" component={CompleteProfileScreen} />
+        <Stack.Screen name="SignUp" component={SignUpScreen} />
+        <Stack.Screen name="AuthLoading" component={AuthLoadingScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   )
