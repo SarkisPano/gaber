@@ -2,9 +2,10 @@ import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { onAuthStateChanged } from 'firebase/auth'
 import React, { useEffect } from 'react'
-import { ActivityIndicator, StyleSheet, View } from 'react-native'
+import { ActivityIndicator, Alert, StyleSheet, View } from 'react-native'
 import { RootStackParamList } from '../navigation'
 import { auth } from '../services/firebase'
+import { getUserProfile } from '../services/firestore'
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>
 
@@ -12,13 +13,31 @@ export default function AuthLoadingScreen() {
   const navigation = useNavigation<NavigationProp>()
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, user => {
-        console.log('Auth state changed:', user)
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      console.log('Auth state changed:', user)
+  
       if (user) {
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'Home' }],
-        })
+        try {
+          const profile = await getUserProfile(user.uid)
+          
+          if (profile && profile.name) {
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'Home' }],
+            })
+          } else {
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'CompleteProfile', params: {
+                name: '',
+                email: user.email || '',
+                profilePicture: '',
+              } }],
+            })
+          }
+        } catch (error) {
+          Alert.alert('Error', 'Failed to load user profile')
+        }
       } else {
         navigation.reset({
           index: 0,
@@ -26,9 +45,9 @@ export default function AuthLoadingScreen() {
         })
       }
     })
-
+  
     return unsubscribe
-  }, [])
+  }, [])  
 
   return (
     <View style={styles.container}>
