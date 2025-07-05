@@ -1,10 +1,11 @@
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { createUserWithEmailAndPassword } from 'firebase/auth'
+import { doc, setDoc } from 'firebase/firestore'
 import React, { useState } from 'react'
 import { Alert, Button, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, View } from 'react-native'
 import { RootStackParamList } from '../navigation'
-import { auth } from '../services/firebase'
+import { auth, firestore } from '../services/firebase'
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>
 
@@ -15,39 +16,57 @@ export default function SignUpScreen() {
 
   const handleSignUp = async () => {
     try {
-      await createUserWithEmailAndPassword(auth, email, password)
-      navigation.navigate('Home')
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password)
+      const user = userCredential.user
+  
+      // Crear documento con datos básicos
+      await setDoc(doc(firestore, 'users', user.uid), {
+        email: user.email,
+        createdAt: new Date().toISOString(),
+      })
+  
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'CompleteProfile' }],
+      })
     } catch (error: any) {
       Alert.alert('Registration failed', error.message)
     }
   }
+  
 
   return (
     <KeyboardAvoidingView
-    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    style={{ flex: 1 }}
-  >
-    <View style={styles.container}>
-      <Text style={styles.title}>Register for Gaber</Text>
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={{ flex: 1 }}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+    >
+      <View style={styles.container}>
+        <Text style={styles.title}>Register for Gaber</Text>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={email}
-        autoCapitalize="none"
-        onChangeText={setEmail}
-      />
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          value={email}
+          autoCapitalize="none"
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          returnKeyType="next"
+        />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        value={password}
-        secureTextEntry
-        onChangeText={setPassword}
-      />
+        <TextInput
+          style={styles.input}
+          placeholder="Password"
+          value={password}
+          secureTextEntry
+          onChangeText={setPassword}
+          returnKeyType="done"
+        />
 
-      <Button title="Register" onPress={handleSignUp} />
-    </View>
+        <View style={styles.buttonContainer}>
+          <Button title="Register" onPress={handleSignUp} />
+        </View>
+      </View>
     </KeyboardAvoidingView>
   )
 }
@@ -71,5 +90,8 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     paddingHorizontal: 12,
     marginBottom: 16,
+  },
+  buttonContainer: {
+    marginTop: 16,
   },
 })

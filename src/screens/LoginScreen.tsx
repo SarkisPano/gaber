@@ -18,6 +18,7 @@ export default function LoginScreen() {
       await signInWithEmailAndPassword(auth, email, password)
       navigation.navigate('Home')
     } catch (error: any) {
+      console.log('Login error:', error.message, error.code)
       Alert.alert('Login failed', error.message)
     }
   }
