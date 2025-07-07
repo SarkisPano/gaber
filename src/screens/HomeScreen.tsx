@@ -64,6 +64,13 @@ export default function HomeScreen() {
       >
         <Text style={styles.buttonText}>Logout</Text>
       </TouchableOpacity>
+      <TouchableOpacity
+        style={[styles.button, { backgroundColor: '#4caf50', marginTop: 20 }]}
+        onPress={() => navigation.navigate('EditProfile')}
+      >
+        <Text style={styles.buttonText}>Edit Profile</Text>
+      </TouchableOpacity>
+
     </View>
   )
 }

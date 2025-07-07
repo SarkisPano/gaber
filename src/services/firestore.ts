@@ -49,3 +49,5 @@ export const getUserProfile = async (uid: string) => {
       throw error
     }
   }
+
+export { firestore }
